@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+            margin-left: 200px;
+        }
+        input{
+            width: 300px;
+            height: 50px;
+            font-size: 30px;
+            text-indent: 10px;
+        }
+        button{
+            font-size: 30px;
+        }
+        .error{
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        select{
+            width: 300px;
+            font-size: 30px;
+        }
+        a{
+            font-size: 30px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 注册 -->
+    <table>
+        <caption><h1>宠物注册页面</h1></caption>
+        <tr>
+            <td>
+                <select id="petType"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="用户名" type="text" name="username">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="宠物名称" type="text" name="pet">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="密码" type="password" name="password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="确认密码" type="password" name="confirm">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="年龄" type="number" name="age">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="颜色" type="text" name="color">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="昵称" type="text" name="nickname">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="重量" type="number" name="weight">(斤)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button type="button" name="btn">提交</button>
+                <a href="login.html">登录</a>
+            </td>
+        </tr>
+    </table>
+</body>
+    <script src="js/jQuery 3.6.0.js"></script>
+    <script src="js/common.js"></script>
+    <script>
+        $(function(){
+            const $username = $('[name = username]')
+            const $pet = $('[name = pet]')
+            const $password = $('[name = password]')
+            const $confirm = $('[name = confirm]')
+            const $age = $('[name = age]')
+            const $color = $('[name = color]')
+            const $nickname = $('[name = nickname]')
+            const $weight = $('[name = weight]')
+            const $btn = $('[name = btn]')
+            const reg_name = /^[\da-zA-Z]{6,20}$/
+            const reg_password = /^[\da-zA-Z]{3,12}$/
+
+            //当用户名修改时候触发
+            $username.change(function(){
+                if(!reg_name.test(this.value)){
+                    alert('用户名必须是6到20位的数字和英文')
+                    return;
+                }
+
+                hmd.queryDB($('#petType').val(),'only',this.value,'name',function(msg){
+                    if(msg){
+                        alert('用户名已存在')
+                    }else{
+                        alert('恭喜，此用户名可以使用')
+                    }
+                })
+            })
+
+            $btn.click(function(){
+                if($username.val() === '' || $password.val() === ''){
+                    alert('用户名或密码为空')
+                    return;
+                }
+                if(!reg_name.test($username.val())){
+                    alert('用户名必须是6到20位的数字和英文')
+                    return;
+                }
+                if(!reg_password.test($password.val())){
+                    alert('密码必须是3到12位的数字和英文')
+                    return;
+                }
+                if($confirm.val()  !== $password.val()){
+                    alert('密码和确认密码不一致')
+                    return;
+                }
+                hmd.insertDB($('#petType').val(),{
+                    name : $username.val(),
+                    pet : $pet.val(),
+                    password : $password.val(),
+                    age : $age.val(),
+                    color : $color.val(),
+                    nickname : $nickname.val(),
+                    weight : $weight.val()
+                },function(){
+                    alert(`用户名为${$username.val()}的数据添加成功`)
+                    location.href = 'login.html'
+                })
+            })
+            // @描述  加载对象仓库
+            function loadPet(){
+                const $petType = $('#petType');
+                $petType.html(
+                    hmd.lists.map(el=>`
+                        <option value="${el}">${el}</option>
+                    `).join('')
+                )
+            }
+
+            function init(){
+                loadPet();
+            }
+
+            init()
+        })
+    </script>
+</html>

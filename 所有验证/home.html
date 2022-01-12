@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>主页</title>
+	<style type="text/css">
+		.header{
+			display: flex;
+			justify-content: space-around;
+		}
+		#logout{
+			cursor: pointer;
+		}
+		a{
+			text-decoration: none;
+			font-size: 14px;
+		}
+		a:hover{
+			color:red;
+		}
+		.search{
+			position: relative;
+		}
+		.s-con{			
+			margin: 0 auto;
+			width: 600px;
+			height: 50px;			
+		}
+		.s-con [name=search]{
+			height: 30px;
+			width: 300px;
+		}
+		#list,#indexNames{
+			height: 35px;
+			font-size: 14px;
+		}
+		.s-con button[name=btn]{
+			height: 30px;
+			padding: 0 10px;
+		}
+		.content{
+			width: 1000px;
+			min-height: 100px;
+			margin: 10px auto;
+			
+		}
+		.content table{
+			width: 100%;
+			border:solid 1px #000;
+			border-collapse: collapse;
+		}
+		.content th{
+			font-weight: bolder;
+
+		}
+		.content td,.content th{
+			border:solid 1px #000;
+			text-align: center;
+		}
+		.content table span{
+			cursor: pointer;
+		}
+		.content table span:hover{
+			color: red;
+		}
+
+	</style>
+</head>
+<body>
+<div class="header">
+	<div id="login"></div>
+	<div id="logout">退出</div>
+</div>
+<div class="search">
+	<div class="s-con">
+		<input type="text" placeholder="请输入索引(昵称、年龄、颜色、宠物名称、用户名)" name="search">
+		<select id="indexNames"></select>
+		<select id="list"></select>
+		<button name="btn">搜索</button>
+	</div>
+</div>
+<div class="content">
+	<table>
+		<tr>
+			<th>用户名</th>
+			<th>宠物名称</th>
+			<th>宠物昵称</th>
+			<th>宠物颜色</th>
+			<th>宠物年龄</th>
+			<th>宠物重量</th>
+			<th>操作</th>
+		</tr>
+	</table>
+</div>
+
+<script src="js/jQuery 3.6.0.js"></script>
+    <script src="js/common.js"></script>
+<script>
+	$(function(){
+		const $login=$('#login');
+		const $logout = $('#logout');
+		const session=sessionStorage;
+		const $search=$('input[name=search]');
+		const $list = $('#list');
+		const $btn = $('button[name=btn]');
+		const $table = $('.content table')
+		const $indexNames = $('#indexNames')
+		//退出
+		$logout.click(function(){
+			if(session.username){
+				session.removeItem('username')
+				loading();
+			}
+		})
+
+		function loading(){
+			if(session.username){
+				$login.html(`
+				${session.username}
+				`)	
+			}else{
+				$login.html(`
+					<a href="login.html">登录</a>
+				`)
+			}
+		}
+		//加载对象仓库和索引
+		function loadObjectStore(){
+			const indexNames=['name','pet','nickname','age','color']
+			$list.html(
+				hmd.lists.map(el=>`
+					<option value="${el}">${el}</option>
+				`).join('')
+			)
+
+			$indexNames.html(
+				indexNames.map(el=>`
+					<option name='${el}'>${el}</option>
+				`).join('')
+			);
+
+		}
+		/*
+		 * @描述 加载宠物信息
+		*/
+		function loadInfoByStore(){
+			
+			const list = $list.val();
+			const bd = $search.val()?'only':'lowerBound';
+			const val = bd==='lowerBound'?1:$search.val()
+			const name = $indexNames.val()
+			$table.find('tbody').html(`
+				<tr>
+					<th>用户名</th>
+					<th>宠物名称</th>
+					<th>宠物昵称</th>
+					<th>宠物颜色</th>
+					<th>宠物年龄</th>
+					<th>宠物重量</th>
+					<th>操作</th>
+				</tr>
+			`)
+			hmd.queryDB(list,bd,val,name,function(msg){
+				console.log(msg)
+				$table.find('tbody').append(`
+					<tr>
+					<td>${msg.value.name}</td>
+					<td>${msg.value.pet}</td>
+					<td>${msg.value.nickname}</td>
+					<td>${msg.value.color}</td>
+					<td>${msg.value.age}</td>
+					<td>${msg.value.weight}</td>
+					<td>
+						<span name='alter' key='${msg.value.id}'>修改</span>
+						<span name='del' key='${msg.value.id}'>删除</span>
+					</td>
+					</tr>`
+				);
+			})
+		}
+
+        $table.on('click','span',function(){
+			if($(this).attr('name') === 'del'){//删除
+				const store=$list.val();
+				const index = $(this).attr('key')
+				const flag = confirm('是否删除？');
+				flag && hmd.deleteDB(store,+index)
+				loadInfoByStore();
+			}else{
+                session.keyPath = $(this).attr('key')
+                session.store = $list.val()
+                location.href = 'update.html'
+			}
+		})
+
+		$btn.click(function(){
+			loadInfoByStore()
+		})
+
+		function init(){
+			loading();
+			loadObjectStore();
+		}
+
+		init();
+	})
+</script>
+</body>
+</html>

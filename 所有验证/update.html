@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+            margin-left: 200px;
+        }
+        input{
+            width: 300px;
+            height: 50px;
+            font-size: 30px;
+            text-indent: 10px;
+        }
+        button{
+            font-size: 30px;
+        }
+        .error{
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        select{
+            width: 300px;
+            font-size: 30px;
+        }
+        a{
+            font-size: 30px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 注册 -->
+    <table>
+        <caption><h1>宠物注册页面</h1></caption>
+        <tr>
+            <td>
+                <span id="petType"></span>
+                <input type="hidden" name="keypath">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="用户名" type="text" name="username">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="宠物名称" type="text" name="pet">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="密码" type="password" name="password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="确认密码" type="password" name="confirm">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="年龄" type="number" name="age">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="颜色" type="text" name="color">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="昵称" type="text" name="nickname">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input placeholder="重量" type="number" name="weight">(斤)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button type="button" name="btn">提交</button>
+                <a href="login.html">登录</a>
+            </td>
+        </tr>
+    </table>
+</body>
+    <script src="js/jQuery 3.6.0.js"></script>
+    <script src="js/common.js"></script>
+    <script>
+        $(function(){
+            const $username = $('[name = username]')
+            const $pet = $('[name = pet]')
+            const $password = $('[name = password]')
+            const $confirm = $('[name = confirm]')
+            const $age = $('[name = age]')
+            const $color = $('[name = color]')
+            const $nickname = $('[name = nickname]')
+            const $weight = $('[name = weight]')
+            const $btn = $('[name = btn]')
+            const session = sessionStorage;
+
+            //  加载信息
+            function loadInfo(){
+                $('#petType').text(session.store)
+                $('[name = keypath').val(session.keypath)
+                hmd.queryDB(session.store,'only',session.keypath,'id',function(msg){
+                    console.log(msg)
+                })
+            }
+
+            function init(){
+                loadInfo()
+            }
+
+            init()
+        })
+    </script>
+</html>
